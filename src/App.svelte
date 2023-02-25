@@ -62,6 +62,7 @@
 	let ans: PQ = PQ.zero(); // last answer
 
 	let showMem:boolean = false;
+	let systemKeyboardAreaFlex: number = 2;
 
 	onMount(()=> {
 		////Temporary layout testing
@@ -77,6 +78,7 @@
 				"output" in testLoadHist[0]) // skip errors and warning for now i guess
 			{
 				History = testLoadHist;
+				scrollNewHistory = true;
 			}
 		}
 		catch {}
@@ -92,7 +94,9 @@
 		if (scrollNewHistory)
 		{
 			scrollNewHistory = false;
-			HistoryElement.scrollTo({top: HistoryElement.scrollHeight});
+			setTimeout(()=>
+				HistoryElement.scrollTo({top: HistoryElement.scrollHeight}),
+				1);
 		}
 		if (needFocus)
 		{
@@ -424,13 +428,18 @@
 	</div>
 
 	{#if reserveKeyboardSpace}
-		<div class="system-keyboard">
+		<div class="system-keyboard" style="flex: {systemKeyboardAreaFlex}">
 			<div>
+				<div>
+					<!-- <button on:click={()=>systemKeyboardAreaFlex+=.1}>Up</button>
+					<button on:click={()=>systemKeyboardAreaFlex-=.1}>Down</button> -->
+				</div>
 				<div>
 					(Mobile device on-screen keyboard area)
 				</div>
 				<div>
-					<button on:click={()=>reserveKeyboardSpace=false}>Collapse</button>
+					<button id="collapse-keyboard-reserve" on:click={()=>reserveKeyboardSpace=false}>Collapse</button>
+					<input type="range" min=".1" max="4.0" step=".01" bind:value={systemKeyboardAreaFlex}>
 				</div>
 			</div>
 		</div>
@@ -441,8 +450,9 @@
 <style lang="scss">
 
 main {
-	//position:absolute;
-	display:grid;
+	position:absolute;
+	// display:grid;
+	display:flex;
 	
 	flex-direction: column;
 	background-color: #282828;
@@ -492,6 +502,7 @@ main {
 }
 
 .funding {
+	z-index: 1;
 	position:absolute;
 	left: 10%;
 	right:10%;
@@ -522,6 +533,7 @@ main {
 	// max-height: calc(100vh * 3 / 5 - 120pt);
 	padding-left: 10pt;
 	padding-right: 10pt;
+	flex: 1;
 
 	.history-item {
 		//display:inline;
@@ -647,7 +659,11 @@ main {
 	display:flex;
 	align-items:center;
 	justify-content: center;
+	//height: .6vh;
 
+	#collapse-keyboard-reserve {
+		margin-right: 4em;
+	}
 }
 
 </style>
