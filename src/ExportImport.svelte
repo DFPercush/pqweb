@@ -123,6 +123,7 @@
 
 <style lang="scss">
 	.export-main {
+		z-index: 1;
 		position:absolute;
 		left: 1em;
 		right: 1em;

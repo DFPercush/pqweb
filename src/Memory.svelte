@@ -136,6 +136,7 @@ function showConfirmAdd()
 <style lang="scss">
 
 .memory-main {
+	z-index: 1;
 	position: absolute;
 	left:10pt;
 	right: 10pt;

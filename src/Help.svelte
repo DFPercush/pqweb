@@ -18,9 +18,13 @@ export function toggleVisibility(){show(!visible);}
 		<span class="flex-spacer"></span>
 		<button class="close" on:click={hide}>X</button>
 	</div>
-	HEEEEELP!
-
-	Up/down to recall history
+	<tr>
+		HELP! I need to write a document!<br>
+		... Sorry, this is kind of the last thing to be developed. More will be coming.
+		
+		TODO:
+			. Up/down to recall history
+	</tr>
 	
 </div>
 {/if}
@@ -37,6 +41,7 @@ export function toggleVisibility(){show(!visible);}
 	padding: .5rem;
 	background-color: #282828;
 	color:silver;
+	z-index:1;
 
 	@media (prefers-color-scheme: light) {
 		background-color: white;

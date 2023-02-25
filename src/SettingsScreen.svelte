@@ -103,7 +103,7 @@
 	// opacity: .5;
 	align-items: center;
 	justify-content: center;
-	//z-index: 1;
+	z-index: 1;
 }
 
 #settings-header {
@@ -113,6 +113,7 @@
 }
 
 #settings-main {
+	//z-index: 1;
 	display: block;
 	position: static;
 	// border: 2px solid red;
