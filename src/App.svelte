@@ -20,7 +20,12 @@
 
 	/*
 	TODO:
-		. whatis button
+		+ print symbolic + long name in memory qty
+		+ whatis show custom vars
+		+ insert variable name from memory
+		+ save keyboard height
+		+ whatis width
+		+ whatis button
 		+ PQ.prettyPrint()
 		+ Save vars
 		+ Settings:
@@ -83,6 +88,12 @@
 		}
 		catch {}
 		iRecall = History.length;
+
+		try {
+			let nKeyFlex = parseFloat(localStorage.getItem("systemKeyboardAreaFlex"));
+			systemKeyboardAreaFlex = nKeyFlex;
+		}
+		catch {}
 
 		//return ()=>{ localStorage.setItem("history", JSON.stringify(History)); };
 	});
@@ -240,7 +251,7 @@
 		mainQuery = before + addText + after;
 		//mainInput.focus();
 		//mainInput.setSelectionRange(start + 1, start + 1);
-		sel = start + 1;
+		sel = start + addText.length;
 		needFocus = true;
 	}
 
@@ -277,6 +288,11 @@
 		SaveVars(myVars);
 	}
 
+	function saveLayout()
+	{
+		localStorage.setItem("systemKeyboardAreaFlex", systemKeyboardAreaFlex.toString());
+	}
+
 	let helpScreen:Help;
 	let exportImportScreen: ExportImport;
 	let showFunding = false;
@@ -290,10 +306,10 @@
 </script>
 
 <SettingsScreen bind:this={settingsScreen}></SettingsScreen>
-<Memory bind:this={memoryScreen} varset={myVars} qty={ans}></Memory>
+<Memory bind:this={memoryScreen} varset={myVars} qty={ans} on:recall={(e)=>insert(e.detail)}></Memory>
 <ExportImport bind:this={exportImportScreen} bind:history={History} bind:vars={myVars} on:import={handleImport}></ExportImport>
 <Help bind:this={helpScreen}></Help>
-<Whatis bind:this={whatisScreen} varset={myVars}></Whatis>
+<Whatis bind:this={whatisScreen} varset={myVars} on:recall={(e)=>{insert(TrimRightZeros(e.detail.factor.toPrecision(settings.precision))+e.detail.name);}}></Whatis>
 <main style="grid-template-rows: 30pt 2fr 120pt {reserveKeyboardSpace ? '3fr' : '20pt'};" on:keydown={onMainKeyDown}>
 	<div class="header">
 		<div>
@@ -304,7 +320,7 @@
 		</div>
 		<div>
 			<button
-				id="funding"
+				id="fundingbutton"
 				class=""
 				on:click={()=>showFunding=!showFunding}
 			>
@@ -317,13 +333,13 @@
 		</div>
 		<div>
 			<button id="exportbutton" class="blend-bg" on:click={()=>exportImportScreen.toggleVisibility()}>
-				<img src={imgExport} alt="Export and import">
+				<img class="svg-fg" src={imgExport} alt="Export and import">
 			</button>
 		</div>
 		<div>
 			<button id="settings-button" class="blend-bg" on:click={()=>settingsScreen.toggleVisibility()}>
 				<!-- class="blend-bg" -->
-				<img src={imgGear} alt="Settings">
+				<img class="svg-fg" src={imgGear} alt="Settings">
 			</button>
 		</div>
 	</div>
@@ -366,7 +382,7 @@
 				{#if hist.error == ""}
 					<div class="right">
 						<div>
-							<button on:click={()=>whatis(hist.output)} class="whatis-button">?</button>
+							<button on:click={()=>whatis(hist.output)} class="whatis-button blend-bg">?</button>
 							<CopyButton text={hist.output} on:clicked={()=>mainInput.focus()}></CopyButton>
 							<span class="history-output">
 								{hist.output}
@@ -439,7 +455,7 @@
 				</div>
 				<div>
 					<button id="collapse-keyboard-reserve" on:click={()=>reserveKeyboardSpace=false}>Collapse</button>
-					<input type="range" min=".1" max="4.0" step=".01" bind:value={systemKeyboardAreaFlex}>
+					<input type="range" min=".1" max="4.0" step=".01" bind:value={systemKeyboardAreaFlex} on:change={saveLayout}>
 				</div>
 			</div>
 		</div>
@@ -460,7 +476,12 @@ main {
 	top: 0;
 	width: 100vw;
 	height: 100vh;
+	@media (prefers-color-scheme: light) {
+		background-color: white;
+		color: black;
+	}
 }
+
 
 // button {
 // 	background: linear-gradient(0deg, #353535, #707070 65%, #353535);
@@ -495,8 +516,10 @@ main {
 		font-weight:700;
 	}
 
-	#funding {
+	#fundingbutton {
+		display:flex;
 		font-size: 12pt;
+		align-items: center;
 		//background-image: url("assets/heart.svg");
 	}
 }
@@ -543,11 +566,11 @@ main {
 		.whatis-button {
 			font-size: 20pt;
 			font-weight: 700;
-			margin-right: 1em;
+			margin-right: 10pt;
 		}
 	
 		.history-output {
-			padding-left: 20pt;
+			padding-left: 10pt;
 			display: inline-block;
 			font-size:16pt;
 			color:rgb(128, 184, 229);
@@ -595,12 +618,16 @@ main {
 		color: white;
 		font-size: 12pt;
 		margin-bottom: 4pt;
-		@media (prefers-color-scheme: light) {
-			background-color: rgb(255, 125, 125)(255, 84, 84);
-			color: rgb(66, 0, 0);
-		}
 	}
 } // history
+
+@media (prefers-color-scheme: light) {
+	.history .history-item .history-errbox {
+				background-color: rgb(255, 125, 125);
+				color: rgb(66, 0, 0);
+		}
+	}
+
 
 .input-section {
 	//position:relative;
@@ -619,7 +646,7 @@ main {
 		font-size: 16pt;
 		padding: .2em;
 		@media (prefers-color-scheme: light) {
-			border:#404040;
+			border: 2px solid black;
 			background-color: white;
 			color:black;
 		}

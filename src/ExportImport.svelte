@@ -107,8 +107,9 @@
 <div class="export-main">
 	<div class="left topbar">
 		<button class="back blend-bg" on:click={hide}>
-			<img src={imgBack} alt="Back">
+			<img class="svg-fg" src={imgBack} alt="Back">
 		</button>
+		<h2>Import / Export</h2>
 	</div>
 	<label for="maintextarea" class="sr-only">Data:</label>
 	<textarea name="maintextarea" id="maintextarea" rows="20" bind:value={txt} aria-hidden="true"></textarea>
@@ -144,6 +145,9 @@
 		.topbar {
 			margin-bottom: .5em;
 			margin-left: 1em;
+			button {
+				margin-right: 2em;
+			}
 		}
 
 		textarea {

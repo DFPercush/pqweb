@@ -1,9 +1,11 @@
 <script lang="ts">
 
+import {createEventDispatcher} from "svelte";
 import type {PQVars} from "./pq";
 import {PQ, SaveVars, settings, IsBuiltInUnit, isAlpha, isAlphaNumeric} from "./pq";
 import imgBack from "./assets/back.svg";
 import imgTrash from "./assets/trash.svg"
+import imgRecall from "./assets/recall.svg";
 
 export let varset: PQVars;
 export let qty: PQ;
@@ -25,6 +27,9 @@ export function toggleVisibility() { show(!visible); }
 $: varnames = Object.keys(varset).sort();
 $: qprint = qty.prettyPrint(varset, settings.prefUnits);
 let newVarName:string;
+
+
+let dispatch = createEventDispatcher();
 
 function delVar(name:string)
 {
@@ -95,7 +100,7 @@ function showConfirmAdd()
 <div class="memory-main">
 	<div class="memory-header">
 		<button id="back" class="blend-bg" on:click={hide}>
-			<img src={imgBack} alt="Back">
+			<img class="svg-fg" src={imgBack} alt="Back">
 		</button>
 		<div class="flex-spacer"></div>
 		<span>Memory</span>
@@ -122,10 +127,13 @@ function showConfirmAdd()
 		{#each varnames as vk}
 			{#if !IsBuiltInUnit(vk)}
 				<div class="varline">
-					<span>{vk}</span>
+					<span>
+						<span>{vk}</span>
+						<button class="recall blend-bg" on:click={()=>{dispatch('recall', vk); hide();}}><img src={imgRecall} alt="Recall" class="svg-fg"></button>
+					</span>
 					<span>=</span>
 					<span>{varset[vk].prettyPrint(varset, settings.prefUnits)}</span>
-					<button class="delvar" on:click={()=>delVar(vk)}> <img src={imgTrash} alt="Delete"> </button>
+					<button class="delvar blend-bg" on:click={()=>delVar(vk)}> <img class="svg-fg" src={imgTrash} alt="Delete"> </button>
 				</div>
 			{/if}
 		{/each}

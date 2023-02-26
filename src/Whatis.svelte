@@ -1,13 +1,19 @@
 <script lang="ts">
-	import { query_selector_all } from "svelte/internal";
-	import {PQ, type PQVars, Units, type Unit, settings} from "./pq";
+	// import { query_selector_all } from "svelte/internal";
+	import {createEventDispatcher} from "svelte";
+	import {PQ, type PQVars, Units, type Unit, settings, IsBuiltInUnit, TrimRightZeros} from "./pq";
 	import imgBack from "./assets/back.svg";
-
+	import imgRecall from "./assets/recall.svg";
 	export let varset: PQVars;
 
 	let wvar : PQ;
 	let wstr: string = ""
+	let qtyStrShort:string = "";
+	let qtyStrLong:string = "";
 	let identicalUnits: Unit[] = [];
+	let identicalVars: string[] = [];
+
+	let dispatch = createEventDispatcher();
 
 	function arreq<T>(a:T[], b:T[]): boolean
 	{
@@ -22,6 +28,16 @@
 	function Reload()
 	{
 		wvar = PQ.parse(wstr, varset);
+		let bkLongPref = settings.useLongNames;
+		try {
+			settings.useLongNames = false;
+			qtyStrShort = wvar.prettyPrint(varset);
+			settings.useLongNames = true;
+			qtyStrLong = wvar.prettyPrint(varset);
+		}
+		catch {}
+		settings.useLongNames = bkLongPref;
+
 		identicalUnits = [];
 		for (var u of Units)
 		{
@@ -30,6 +46,22 @@
 				identicalUnits.push(u);
 			}
 		}
+
+		identicalVars = [];
+		for (var name of Object.keys(varset))
+		{
+			if (!IsBuiltInUnit(name))
+			{
+				if (arreq(varset[name].dim, wvar.dim))
+				{
+					//console.log(name);
+					identicalVars.push(name);
+				}
+			}
+		}
+
+		identicalUnits = identicalUnits;
+		identicalVars = identicalVars;
 	}
 
 	export let visible: boolean = false;
@@ -49,11 +81,13 @@
 {#if visible}
 	<div class="whatis">
 		<div class="header">
-			<button on:click={hide}><img src={imgBack} alt="Back"></button>
-			<div class="flex-spacer"></div>
-			<span class="qty">{wstr}</span>
-			<div class="flex-spacer"></div>
+			<button on:click={hide} class="blend-bg"><img class="svg-fg" src={imgBack} alt="Back"></button>
+			<!-- <div class="flex-spacer"></div> -->
+			<!-- <div class="flex-spacer"></div> -->
 		</div>
+			<!-- <span class="qty">{wstr}</span> -->
+		<div class="qty">{qtyStrShort}</div>
+		<div class="qty">{qtyStrLong}</div>
 		<div class="dim">
 			<div><div>Mass</div></div><div>{wvar.dim[0]}</div>
 			<div><div>Distance</div></div><div>{wvar.dim[1]}</div>
@@ -66,14 +100,25 @@
 		<div class="identical">
 			{#each identicalUnits as u}
 				<!-- <div class="identline"> -->
-					<div>{(wvar.n / u.factor).toPrecision(settings.precision)}</div>
+					<div>{TrimRightZeros((wvar.n / u.factor).toPrecision(settings.precision))}</div>
 					<div>{u.symbol}</div>
 					<div>{u.longNameSingular}</div>
 					<div>{u.longNamePlural}</div>
 				<!-- </div> -->
 			{/each}
 		</div>
-		<button on:click={hide}>Close</button>
+		<h2>Variables:</h2>
+		<!-- {identicalVars.length} -->
+		<div class="identical-vars">
+			{#each identicalVars as vname}
+				<div>{TrimRightZeros((wvar.n / varset[vname].n).toPrecision(settings.precision))}</div>
+				<div>{vname}</div>
+				<button class="blend-bg" on:click={()=>{dispatch('recall', {name:vname, factor: wvar.n / varset[vname].n}); hide();}}>
+					<img class="svg-fg" src={imgRecall} alt="Recall">
+				</button>
+			{/each}
+		</div>
+		<button id="close-end" on:click={hide}>Close</button>
 	</div>
 {/if}
 
@@ -87,18 +132,29 @@
 		bottom:1rem;
 		z-index:1;
 		overflow-y: scroll;
+		overflow-x: scroll;
 		border: 2px solid lightblue;
 		background-color: #282828;
 		color:silver;
+
+		@media (prefers-color-scheme: light) {
+			background-color: white;
+			color:black;
+		}
+
 
 		.header {
 			display:flex;
 			flex-direction: row;
 			margin:1em;
 			font-size: 16pt;
-			.qty {
-				color:lightblue;
-				font-size: 22pt;
+		}
+		.qty {
+			color:lightblue;
+			font-size: 16pt;
+			@media (prefers-color-scheme: light) {
+				//background-color: white;
+				color:blue;
 			}
 		}
 		.dim {
@@ -127,7 +183,10 @@
 		.identical {
 			display:grid;
 			justify-content: center;
-
+			overflow-x:scroll;
+			width: max-content;
+			padding-left: 1em;
+			padding-right: 1em;
 			grid-template-columns: max-content max-content max-content max-content;
 			&>* {
 				// justify-content: left;
@@ -138,6 +197,22 @@
 				// place-items: left;
 				margin-left: 5pt
 			}
+		}
+
+		.identical-vars {
+			// background-color: red;
+			display:grid;
+			grid-template-columns: max-content max-content max-content;
+			justify-content: center;
+			overflow-x: scroll;
+			padding-bottom: .5em;
+			&>* {
+				margin-left: 5pt;
+			}
+		}
+
+		#close-end {
+			margin: 1em;
 		}
 	}
 
