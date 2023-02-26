@@ -54,6 +54,7 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <path
+		class="svg-fg"
        sodipodi:nodetypes="cccccccccc"
        id="path2180"
        d="M 5.5327952,3.3522606 H 2.0340392 L 4.0428307,5.543183 2.5262597,5.528769 0.02524741,2.7324603 2.3400142,0.03704927 H 4.002921 L 2.0872523,2.11266 h 3.4721494 z"
