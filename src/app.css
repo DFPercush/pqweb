@@ -7,6 +7,8 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
+
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,6 +16,25 @@
   -webkit-text-size-adjust: 100%;
 
   --mylightblue: color:rgb(128, 184, 229);
+  --theme-color: blue;
+	--fg: #cccccc;
+	--bg: #282828;
+}
+
+.themed-svg {
+	@media (prefers-color-scheme: light) {
+
+		//fill: black !important;
+		//stroke: black !important;
+		// filter: brightness(100%) invert(100%) brightness(0);
+		filter: brightness(2) invert(100%);
+	}
+}
+
+.theme-fg {
+	color: silver;
+	fill: #cccccc !important;
+	stroke: #cccccc !important;
 }
 
 
@@ -99,11 +120,17 @@ button {
   /* background-color: #1a1a1a; */
   /* background: linear-gradient(0deg, #353535, #707070 65%, #353535); */
   background: linear-gradient(0deg, #252525, #444444 65%, #252525);
+  /* background-color: blue; */
+  
   color: white;
 
   cursor: pointer;
   transition: border-color 0.25s;
+
 }
+
+
+
 button:hover {
   border-color: #646cff;
 }
@@ -119,14 +146,26 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
+    color: #000000;
     background-color: #ffffff;
+	--theme-color: yellow;
   }
   a:hover {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
-	color: black;
+	background: none;
+    background-color: #bde4ff;
+	color: currentColor;
   }
+
+	.svg-fg {
+		/* color: black; */
+		/* fill: black !important; */
+		/* stroke: black !important; */
+		/* --fg: #000000; */
+		/* --bg:#FFFFFF; */
+		filter: brightness(2) invert(100%);
+	}
+
 }

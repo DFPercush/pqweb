@@ -10,7 +10,7 @@
 
 
 <button class="blend-bg" tabindex="-1" on:click={()=>dispatch('click', "recall")}>
-	<img src={imgRecall} alt="Recall" tabindex="-1">
+	<img class="svg-fg" src={imgRecall} alt="Recall" tabindex="-1">
 </button>
 
 <style lang="scss">

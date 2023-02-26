@@ -2,6 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+	class="svg-fg"
    width="16pt"
    height="16pt"
    viewBox="0 0 5.6444443 5.6444444"
@@ -40,6 +41,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <ellipse
+		class="svg-fg"
        style="fill:none;stroke:#b3b3b3;stroke-width:1.19829;stroke-dasharray:none;stroke-opacity:1"
        id="path2264"
        cx="4.0003443"
@@ -48,6 +50,7 @@
        ry="1.5285708"
        transform="rotate(45)" />
     <rect
+		class="svg-fg"
        style="fill:#b3b3b3;fill-opacity:1;stroke:#b3b3b3;stroke-width:0.380931;stroke-dasharray:none;stroke-opacity:1"
        id="rect2372"
        width="1.0110339"
@@ -56,10 +59,12 @@
        y="-0.38856509"
        transform="rotate(45)" />
     <g
+		class="svg-fg"
        id="g3858"
        transform="rotate(135,2.8297211,2.7647569)"
        style="fill:#b3b3b3;stroke:#b3b3b3">
       <rect
+		  class="svg-fg"
          style="fill:#b3b3b3;fill-opacity:1;stroke:#b3b3b3;stroke-width:0.380931;stroke-dasharray:none;stroke-opacity:1"
          id="rect2372-6"
          width="1.0110339"
@@ -68,14 +73,17 @@
          y="2.4306967" />
     </g>
     <g
+		class="svg-fg"
        id="g3915"
        transform="rotate(90,2.8860967,2.8117454)"
        style="fill:#b3b3b3;stroke:#b3b3b3">
       <g
+		  class="svg-fg"
          id="g3858-3"
          transform="rotate(90,2.7636119,2.7913869)"
          style="fill:#b3b3b3;stroke:#b3b3b3">
         <rect
+			class="svg-fg"
            style="fill:#b3b3b3;fill-opacity:1;stroke:#b3b3b3;stroke-width:0.380931;stroke-dasharray:none;stroke-opacity:1"
            id="rect2372-6-56"
            width="1.0110339"
@@ -85,18 +93,22 @@
       </g>
     </g>
     <g
+		class="svg-fg"
        id="g3993"
        transform="translate(1.6903069,2.3579447)"
        style="fill:#b3b3b3;stroke:#b3b3b3">
       <g
+		  class="svg-fg"
          id="g3915-3"
          transform="rotate(90,1.1367908,-1.2955051)"
          style="fill:#b3b3b3;stroke:#b3b3b3">
         <g
+			class="svg-fg"
            id="g3858-3-6"
            transform="rotate(90,2.7636119,2.7913869)"
            style="fill:#b3b3b3;stroke:#b3b3b3">
           <rect
+			  class="svg-fg"
              style="fill:#b3b3b3;fill-opacity:1;stroke:#b3b3b3;stroke-width:0.380931;stroke-dasharray:none;stroke-opacity:1"
              id="rect2372-6-56-0"
              width="1.0110339"
@@ -108,17 +120,21 @@
     </g>
     <g
        id="g3946"
+		class="svg-fg"
        transform="translate(3.8390249,0.36504281)"
        style="fill:#b3b3b3;stroke:#b3b3b3">
       <g
+		  class="svg-fg"
          id="g3915-2"
          transform="translate(-3.7654957,-0.38091422)"
          style="fill:#b3b3b3;stroke:#b3b3b3">
         <g
+			class="svg-fg"
            id="g3858-3-9"
            transform="rotate(90,2.7636119,2.7913869)"
            style="fill:#b3b3b3;stroke:#b3b3b3">
           <rect
+			  class="svg-fg"
              style="fill:#b3b3b3;fill-opacity:1;stroke:#b3b3b3;stroke-width:0.380931;stroke-dasharray:none;stroke-opacity:1"
              id="rect2372-6-56-1"
              width="1.0110339"
@@ -129,18 +145,22 @@
       </g>
     </g>
     <g
+		class="svg-fg"
        id="g3946-2"
        transform="translate(3.8390249,4.5312922)"
        style="fill:#b3b3b3;stroke:#b3b3b3">
       <g
+		  class="svg-fg"
          id="g3915-7"
          transform="translate(-3.7654957,-0.38091422)"
          style="fill:#b3b3b3;stroke:#b3b3b3">
         <g
+			class="svg-fg"
            id="g3858-3-0"
            transform="rotate(90,2.7636119,2.7913869)"
            style="fill:#b3b3b3;stroke:#b3b3b3">
           <rect
+			  class="svg-fg"
              style="fill:#b3b3b3;fill-opacity:1;stroke:#b3b3b3;stroke-width:0.380931;stroke-dasharray:none;stroke-opacity:1"
              id="rect2372-6-56-9"
              width="1.0110339"

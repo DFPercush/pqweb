@@ -35,7 +35,7 @@
 		<div id="settings-main">
 			<div id="settings-header">
 				<button id="back" class="blend-bg" on:click={hide}>
-					<img src={imgBack} alt="Back">
+					<img class="svg-fg" src={imgBack} alt="Back">
 				</button>
 			</div>
 			<form action="">
@@ -104,6 +104,11 @@
 	align-items: center;
 	justify-content: center;
 	z-index: 1;
+
+	@media (prefers-color-scheme: light) {
+		background-color: white;
+		color:black;
+	}
 }
 
 #settings-header {

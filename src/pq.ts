@@ -846,12 +846,12 @@ export class PQ
 			else if (c == '.') { curClass = CharClass.NUMBER; }
 			else if (prevClass == CharClass.NUMBER && (c == 'e' || c == 'E'))
 			{
-				console.log("eeeee!");
+				//console.log("eeeee!");
 				curClass = CharClass.NUMBER;
 			}
 			else if (prevClass == CharClass.NUMBER && (pc == 'e' || pc == 'E') && (c == '+' || c == '-'))
 			{
-				console.log("EEEEEE!");
+				//console.log("EEEEEE!");
 				curClass = CharClass.NUMBER;
 			}
 			else if (prevClass == CharClass.SYMBOL && isAlphaNumeric(c)) { curClass = CharClass.SYMBOL; }
@@ -942,7 +942,7 @@ export class PQ
 		//}
 
 		// DBG: PRINT TOKEN STREAM
-		console.log(sca(ts));
+		//console.log(sca(ts));
 
 
 		let root: ASTNode =
