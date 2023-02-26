@@ -23,10 +23,6 @@
 
 .themed-svg {
 	@media (prefers-color-scheme: light) {
-
-		//fill: black !important;
-		//stroke: black !important;
-		// filter: brightness(100%) invert(100%) brightness(0);
 		filter: brightness(2) invert(100%);
 	}
 }
