@@ -46,7 +46,7 @@ const KnownUnitOffsets: number[] =
 	273.15, // degC
 	255.37222222222222222222222222222,  // degF
 	273.15, // degc
-	255.37222222222222222222222222222  // degc
+	255.37222222222222222222222222222  // degf
 ];
 
 // TODO: Possible units: mpg?
@@ -59,6 +59,8 @@ export const Units: Unit[] =
 	du("degF","degreeF","degreesF",0.55555555555555555555555555555556, [0,0,0,1,0,0], false, 2),
 	du("degc","degreeC","degreesC",1.0, [0,0,0,1,0,0], false, 3),
 	du("degf","degreeF","degreesF",0.55555555555555555555555555555556, [0,0,0,1,0,0], false, 4),
+	// ^ Don't mess with these, they need to be at the start of the array
+
 	du("g", "gram","grams",0.001, [1,0,0,0,0,0], true),
 	du("rd","radian","radians",1, [ 0, 0, 0, 0, 0,0], false),
 	du("deg","degree","degrees",0.01745329251994329576923690768489, [0,0,0,0,0,0], false),
@@ -442,24 +444,34 @@ export class PQ
 		let r = PQ.zero();
 
 		//if (a.isScalar() || b.isScalar()) { r.n = a.n / b.n; }
+		//r.n = (a.n - KnownUnitOffsets[a.iofs]) / (b.n - KnownUnitOffsets[b.iofs]);
 		r.n = (a.n - KnownUnitOffsets[a.iofs]) / (b.n - KnownUnitOffsets[b.iofs]);
+		r.iofs = 0;
 		//console.log(`div(): (${a.n} - ${KnownUnitOffsets[a.iofs]}) / (${b.n} - ${KnownUnitOffsets[b.iofs]}) ==> ${r.n}`);
 		//if (a.isScalar() || b.isScalar()) { r.n += KnownUnitOffsets[a.iofs] + KnownUnitOffsets[b.iofs]; }
-		if (a.isScalar())
-		{
-			//console.log(`${r.n} += ${KnownUnitOffsets[a.iofs]} + ${KnownUnitOffsets[b.iofs]};`);
-			r.n += KnownUnitOffsets[b.iofs];
-			r.iofs = b.iofs;
-		}
-		else if (b.isScalar())
-		{
-			r.n += KnownUnitOffsets[a.iofs];
-			r.iofs = a.iofs;
-		}
-		else
-		{
-			r.iofs = 0;
-		}
+		//if (a.isScalar())
+		//{
+		//	//console.log(`${r.n} += ${KnownUnitOffsets[a.iofs]} + ${KnownUnitOffsets[b.iofs]};`);
+		//	r.n += KnownUnitOffsets[b.iofs];
+		//	r.iofs = b.iofs;
+		//}
+		//else if (b.isScalar())
+		//{
+		//	r.n += KnownUnitOffsets[a.iofs];
+		//	r.iofs = a.iofs;
+		//}
+		//else if (arreq(a.dim, b.dim))
+		////else if (KnownUnitOffsets[b.iofs] === 0)
+		//{
+		//	console.log("temp to temp");
+		//	r.n += KnownUnitOffsets[a.iofs];
+		//	r.n += KnownUnitOffsets[b.iofs];
+		//	r.iofs = b.iofs;
+		//}
+		//else
+		//{
+		//	r.iofs = 0;
+		//}
 
 
 
@@ -479,11 +491,11 @@ export class PQ
 				delete r.extra[eb];
 			}
 		}
-		if (r.isScalar())
-		{
-			if (a.iofs != 0) { r.n -= KnownUnitOffsets[a.iofs]; }
-			if (b.iofs != 0) { r.n -= KnownUnitOffsets[b.iofs]; }
-		}
+		//if (r.magdim() == 0)
+		//{
+		//	if (a.iofs != 0) { r.n += KnownUnitOffsets[a.iofs]; }
+		//	if (b.iofs != 0) { r.n -= KnownUnitOffsets[b.iofs]; }
+		//}
 		return r;
 	}
 	
@@ -611,6 +623,8 @@ export class PQ
 		let testpow = 0;
 		let ipu = 0
 
+		let onlyTemperature : boolean = arreq(q.dim, [0,0,0,1,0,0]);
+
 		let mdpref: number;
 		do
 		{
@@ -627,9 +641,25 @@ export class PQ
 			if (sea.isValidResult())
 			{
 				out[sea.bestUnitName] = sea.bestPow;
-				q = q.div(sea.bestUnit.pow(sea.bestPow));
+				if (onlyTemperature)
+				{
+					// This is so hacky, I hate it.
+					// Alright, so PQ.n *is* the Kelvin representation, as long as it's a temperature^1 unit.
+					// So all we have to do is convert to the right scale. Source offset doesn't matter.
+					// From PQ.cpp:
+					//	r.value = (r.value - rom(KnownUnitOffsets[pu[ipu].iUnit])) / rom(KnownUnits[pu[ipu].iUnit].factor);
+					// translated
+					var ofs = KnownUnitOffsets[sea.bestUnit.iofs];
+					var factor = sea.bestUnit.n - ofs;
+					q.n = (q.n - ofs) / factor;
+					q.dim = [0,0,0,0,0,0];
+				}
+				else
+				{
+					q = q.div(sea.bestUnit.pow(sea.bestPow));
+				}
 			}
-		} while (q.magdim() < mdpref);
+		} while (q.magdim() > 0 && q.magdim() < mdpref);
 
 		while (q.magdim() > 0)
 		{
@@ -652,7 +682,26 @@ export class PQ
 			u = varset[unit.symbol];
 			if (unit.applySIPrefixes)
 			{
-				qtest = q.div(u.pow(sea.bestPow));
+				//var ofs = KnownUnitOffsets[q.iofs];
+				//var to_ofs = KnownUnitOffsets[sea.bestUnit.iofs];
+
+
+				//qtest = q.div(u.pow(sea.bestPow));
+				//if (onlyTemperature) { qtest.n += ofs - to_ofs; throw new Error("Not implemented"); }
+				if (onlyTemperature)
+				{
+					var ofs = KnownUnitOffsets[unit.iofs];
+					var factor = unit.factor; // sea.bestUnit.n - ofs;
+					qtest = q.clone();
+					qtest.n = (q.n - ofs) / factor;
+					qtest.dim = [0,0,0,0,0,0];
+				}
+				else
+				{
+					qtest = q.div(u.pow(sea.bestPow));
+				}
+
+
 				let foundPrefix = false;
 				for (var iPrefix = 0; iPrefix < Prefixes.length; iPrefix++)
 				{
@@ -669,13 +718,40 @@ export class PQ
 				}
 				if (!foundPrefix)
 				{
-					q = q.div(u.pow(sea.bestPow));
+					//q = q.div(u.pow(sea.bestPow));
+					if (onlyTemperature)
+					{
+						var ofs = KnownUnitOffsets[unit.iofs];
+						var factor = unit.factor; // sea.bestUnit.n - ofs;
+						q.n = (q.n - ofs) / factor;
+						q.dim = [0,0,0,0,0,0];
+					}
+					else
+					{
+						q = q.div(u.pow(sea.bestPow));
+					}
+	
 					out[PQ.getPreferredName(null, unit, q.n)] = sea.bestPow;
 				}
 			}
 			else
 			{
-				q = q.div(u.pow(sea.bestPow));
+				//var ofs = KnownUnitOffsets[q.iofs];
+				//var to_ofs = KnownUnitOffsets[sea.bestUnit.iofs];
+				//q = q.div(u.pow(sea.bestPow));
+				//if (onlyTemperature) { q.n += ofs - to_ofs; throw new Error("Not implemented"); }
+				if (onlyTemperature)
+				{
+					var ofs = KnownUnitOffsets[unit.iofs];
+					var factor = unit.factor; // sea.bestUnit.n - ofs;
+					q.n = (q.n - ofs) / factor;
+					q.dim = [0,0,0,0,0,0];
+				}
+				else
+				{
+					q = q.div(u.pow(sea.bestPow));
+				}
+
 				out[PQ.getPreferredName(null, unit, q.n)] = sea.bestPow;
 			} // apply prefixes
 		}  // while magdim > 0
@@ -735,7 +811,7 @@ export class PQ
 			c = s[i];
 			if (forbiddenChars.indexOf(c) !== -1)
 			{
-				throw new SyntaxError(`Forbidden character ${c} at index ${i}`);
+				throw new SyntaxError(`Invalid character ${c} at index ${i}`);
 			}
 
 			if (prevClass == CharClass.WHITESPACE) { tokenBegin = i; }
@@ -795,9 +871,11 @@ export class PQ
 
 		// Now we have a token stream, ts.
 		// First let's detect unary operators like signs of numbers
-		for (var i = 1; i < ts.length - 1; i++)
+		const tspace : Token = new Token(CharClass.WHITESPACE, s, 0,0," ");
+		for (var i = 0; i < ts.length - 1; i++)
 		{
-			if (ts[i].ty == CharClass.SUB && ts[i-1].ty != CharClass.SYMBOL && ts[i-1].ty != CharClass.NUMBER &&ts[i-1].ty != CharClass.CLOSE &&
+			var pt = (i > 0) ? ts[i-1] : tspace;
+			if (ts[i].ty == CharClass.SUB && pt.ty != CharClass.SYMBOL && pt.ty != CharClass.NUMBER && pt.ty != CharClass.CLOSE &&
 				(ts[i+1].ty == CharClass.NUMBER || ts[i+1].ty == CharClass.SYMBOL))
 			{
 				//if (ts[i+1].ty == CharClass.NUMBER) || ts[i+1].ty == CharClass.SYMBOL)
@@ -813,7 +891,7 @@ export class PQ
 				);
 				i += 3;
 			}
-			else if (ts[i].ty == CharClass.ADD && ts[i-1].ty != CharClass.SYMBOL && ts[i-1].ty != CharClass.NUMBER && ts[i-1].ty != CharClass.CLOSE &&
+			else if (ts[i].ty == CharClass.ADD && pt.ty != CharClass.SYMBOL && pt.ty != CharClass.NUMBER && pt.ty != CharClass.CLOSE &&
 				(ts[i+1].ty == CharClass.NUMBER || ts[i+1].ty == CharClass.SYMBOL))
 			{
 				ts.splice(i, 1);
@@ -1215,7 +1293,8 @@ export function LoadVars(): PQVars
 			}
 		}
 	}
-	console.log(`Loaded ${nStored} vars and ${Object.keys(r).length - nStored} built-in units.`);
+	//console.log(`Loaded ${nStored} vars and ${Object.keys(r).length - nStored} built-in units.`);
+	console.log(`Loaded ${nStored} variables, ${Units.length} units, and ${Prefixes.length} prefixes.`);
 	//r.order = Object.keys(r.vars).sort((a: string, b:string): number => r.vars[b].magdim() - r.vars[a].magdim());
 	//console.log(`Still have ${Object.keys(r.vars).length} vars and units`);
 	return r;
@@ -1501,6 +1580,16 @@ export class BestUnitSearch
 		}
 	} // next()
 };
+
+function arreq<T>(a:T[], b:T[]): boolean
+{
+	if (a.length !== b.length) { return false; }
+	for (var i = 0; i < a.length; i++)
+	{
+		if (a[i] !== b[i]) return false;
+	}
+	return true;
+}
 
 
 class Settings

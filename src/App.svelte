@@ -20,6 +20,7 @@
 
 	/*
 	TODO:
+		. higher level catch
 		+ print symbolic + long name in memory qty
 		+ whatis show custom vars
 		+ insert variable name from memory
