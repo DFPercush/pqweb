@@ -22,6 +22,7 @@ export type HistoryItem =
 };
 
 
+
 type UnitList = {[name:string]:number};
 
 function du(sym:string, lns:string, lnp:string, f:number, d:Dim, p:boolean = false, iofs: number = 0): Unit
@@ -596,186 +597,96 @@ export class PQ
 			return pname + u.symbol;
 		}
 	}
+
+
+
 	
 	prettyPrint(varset: PQVars = {}, preferredUnits: string = ""): string
 	{
-		//console.log(`printing PQ ${this.n}[${this.dim[0]},${this.dim[1]},${this.dim[2]},${this.dim[3]},${this.dim[4]},${this.dim[5]}]`);
-		//let q = this.clone();
-		//let units = bestConversion(q, varset);
-		//for (var k in units)
-		//{
-		//	var pw = units[k];
-		//	var iUnit = UnitMapNameToIndex[k];
-		//	if (iUnit === undefined) { continue; }
-		//	var u = Units[iUnit];
-		//	let foundPrefix = false;
-		//	if (u.applySIPrefixes)
-		//	{
-		//		for (var iPrefix = 0; iPrefix < Prefixes.length; iPrefix++)
-		//		{
-		//			var p = Prefixes[iPrefix];
-		//			var testNum = this.n * (pw == 1 ? p.factor : Math.pow(p.factor, pw));
-		//			if (testNum >= 1.0 && testNum <= 1000.0)
-		//			{
-		//				delete units[k];
-		//				// TODO: long name config
-		//				units[p.symbol + k] = pw;
-		//				q.n = testNum;
-		//				foundPrefix = true;
-		//				break;
-		//			}
-		//		}
-		//	}
-		//	if (foundPrefix) { break; }
-		//}
-		////for ()
-		//let out = units;
-
-
-
-
-
-
 		let q = this.clone();
 		let out: {[name: string]: number} = {};
+		let sea: BestUnitSearch = new BestUnitSearch();
 		
 		let pu = preferredUnits.split(' ');
-		//let order = [...pu, ...varset.order];
 		let testpow = 0;
-		for (var name of pu)
+		let ipu = 0
+
+		let mdpref: number;
+		do
 		{
-			if (name === "") { continue; }
-			if (varset[name] !== undefined)
+			mdpref = q.magdim();
+			sea.reset(q);
+			for (var name of pu)
 			{
-				testpow = q.bestPower(varset[name], true);
-				if (testpow != 0)
+				if (name !== "" && varset[name] !== undefined)
 				{
-					q = q.div(varset[name].pow(testpow));
-					out[name] = testpow;
+					sea.tryNext(ipu, varset[name], name);
 				}
-				//var testmd: PQ;
-				////var magdimBefore = q.magdim();
-				//testmd = q.div(varset[name]);
-				//if (testmd.magdim() <= magdimBefore)
-				//{
-				//	q = testmd;
-				//}
-				//else if (false) // TODO: Setting to force preferred units, maybe two settings: one for manually typed ones and one for always
-				//{
-				//	PQ.warn(`Showing in terms of ${name} increases complexity.`);
-				//	q = testmd;
-				//}
+				ipu++;
 			}
-		}
+			if (sea.isValidResult())
+			{
+				out[sea.bestUnitName] = sea.bestPow;
+				q = q.div(sea.bestUnit.pow(sea.bestPow));
+			}
+		} while (q.magdim() < mdpref);
+
 		while (q.magdim() > 0)
 		{
-			//for (var iUnit of UnitMostComplexOrder)
+			let unit: Unit;
+			let u: PQ;
+			let qtest: PQ;
+
+			sea.reset(q);
 			for (var iUnit = 0; iUnit < Units.length; iUnit++)
 			{
-				let unit = Units[iUnit];
-				if (q.magdim() == 0) { break; }
-				let u: PQ;
-				let uname: string;
-				uname = unit.symbol;
-				u = varset[uname];
+				sea.tryNext(iUnit, varset[Units[iUnit].symbol], Units[iUnit].symbol);
+			}
 
-				let testpow = q.bestPower(u);
-				if (testpow != 0)
+			if (!sea.isValidResult())
+			{
+				throw new Error("No units found. Possible data corruption. Reload.");
+			}
+
+			unit = Units[sea.iBestUnit];
+			u = varset[unit.symbol];
+			if (unit.applySIPrefixes)
+			{
+				qtest = q.div(u.pow(sea.bestPow));
+				let foundPrefix = false;
+				for (var iPrefix = 0; iPrefix < Prefixes.length; iPrefix++)
 				{
-					if (unit.applySIPrefixes) // && (q.n < 0.9 || q.n >= 1000.0))
+					let p = Prefixes[iPrefix];
+					let npre = qtest.n / Math.pow(p.factor, sea.bestPow);
+					if (npre >= 0.99 && npre < 1000.0)
 					{
-						let qtest = q.div(u.pow(testpow));
-						let foundPrefix = false;
-						for (var iPrefix = 0; iPrefix < Prefixes.length; iPrefix++)
-						{
-							let p = Prefixes[iPrefix];
-							let npre = qtest.n / Math.pow(p.factor, testpow);
-							//let npre = qtest.n / Math.pow(p.factor * unit.factor, testpow);
-							//let npre = q.n / (Math.pow(p.factor * unit.factor, testpow));
-							if (npre >= 0.9 && npre < 1000.0)
-							{
-								q = qtest;
-								//q = q.div()
-								q.n = npre;
-								//out[p.symbol + unit.symbol] = testpow;
-								out[PQ.getPreferredName(p, unit, q.n)] = testpow;
-								foundPrefix = true;
-								break;
-							}
-						}
-						if (!foundPrefix)
-						{
-							q = q.div(u.pow(testpow));
-							//out[unit.symbol] = testpow;
-							out[PQ.getPreferredName(null, unit, q.n)] = testpow;
-						}
-					}
-					else
-					{
-						q = q.div(u.pow(testpow));
-						//out[unit.symbol] = testpow;
-						out[PQ.getPreferredName(null, unit, q.n)] = testpow;
+						q = qtest;
+						q.n = npre;
+						out[PQ.getPreferredName(p, unit, q.n)] = sea.bestPow;
+						foundPrefix = true;
+						break;
 					}
 				}
-				
-
-				//if (!u) { uname = unit.longNameSingular; u = varset[uname]; }
-				//if (!u) { uname = unit.longNamePlural; u = varset[uname]; }
-				//if (!u) { continue; }
-				//var testmul = q.mul(u);
-				//var testdiv = q.div(u);
-				////var sign: number;
-				////var prevMagdim = q.magdim() + 1;
-				//let test: PQ;
-				//let power: number = 0;
-				//if (testdiv.magdim() < q.magdim())
-				//{
-				//	//sign = 1;
-				//	while (true)
-				//	{
-				//		test = q.clone().div(u);
-				//		if (test.magdim() < q.magdim())
-				//		{
-				//			power += 1;
-				//			test = q;
-				//		}
-				//		else {break;}
-				//	}
-				//}
-				//else if (testmul.magdim() < q.magdim())
-				//{
-				//	//sign = -1;
-				//	while (true)
-				//	{
-				//		test = q.mul(u);
-				//		if (test.magdim() < q.magdim())
-				//		{
-				//			power -= 1;
-				//			test = q;
-				//		}
-				//		else { break; }
-				//	}
-				//}
-				//else { continue; }
-				//
-				//if (power != 0)
-				//{
-				//	// TODO: long name setting
-				//	out[uname] = power;
-				//}
+				if (!foundPrefix)
+				{
+					q = q.div(u.pow(sea.bestPow));
+					out[PQ.getPreferredName(null, unit, q.n)] = sea.bestPow;
+				}
 			}
-		}
+			else
+			{
+				q = q.div(u.pow(sea.bestPow));
+				out[PQ.getPreferredName(null, unit, q.n)] = sea.bestPow;
+			} // apply prefixes
+		}  // while magdim > 0
 
-		// TODO: output in terms of negative exponent setting
-		
+		// We have our units and powers.
+		// Start building the result string
 		let ret = TrimRightZeros(q.n.toPrecision(settings.precision || 6));
-		//let ret = (Math.round(q.n * roundSetting) / roundSetting).toString();
-		//if (Object.keys(out).length > 0) ret += " ";
-		//let hasNegatives = false;
 		let negativeCount = 0
 		for (var k in out)
 		{
-			if (out[k] > 0)
+			if (out[k] > 0 || settings.negexp)
 			{
 				ret += " ";
 				ret += k;
@@ -787,7 +698,7 @@ export class PQ
 			}
 			else if (out[k] < 0) { negativeCount++; }
 		}
-		if (negativeCount > 0)
+		if ((negativeCount > 0) && (!settings.negexp))
 		{
 			ret += " / ";
 			if (negativeCount > 1) { ret += "("; }
@@ -807,8 +718,6 @@ export class PQ
 			if (negativeCount > 1) { ret += ")"; }
 		}
 		return ret;
-
-		//return `${this.n}[${this.dim[0]},${this.dim[1]},${this.dim[2]},${this.dim[3]},${this.dim[4]},${this.dim[5]}]`;
 	}
 
 
@@ -816,11 +725,6 @@ export class PQ
 	static parse(s:string, varset: PQVars): PQ
 	{
 		let ts: Token[] = [];
-		//let left: PQ;
-		//let right: PQ;
-		//let sp: string[];
-		//sp = s.split(",");
-
 		let c = ' ';
 		let pc = ' ';
 		let curClass: CharClass = CharClass.WHITESPACE;
@@ -1529,6 +1433,75 @@ export function TrimRightZeros(s:string)
 	if (s[iz] == '.') {iz--;}
 	return s.substring(0, iz + 1);
 }
+
+
+export class BestUnitSearch
+{
+	iBestUnit = -1;
+	bestUnit: PQ;
+	bestUnitName: string;
+	bestPow = 0;
+	bestMagdimDiff = 0;
+	q: PQ;
+
+	reset(currentValue: PQ)
+	{
+		this.init();
+		this.q = currentValue;
+	}
+
+	init()
+	{
+		this.iBestUnit = -1;
+		this.bestMagdimDiff = 0;
+		this.bestUnit = null;
+		this.bestUnitName = "";
+		this.bestPow = 0;
+		this.q = null;
+	}
+
+	constructor()
+	{
+		this.init();
+	}
+
+	isValidResult() : boolean
+	{
+		return this.iBestUnit !== -1;
+	}
+
+	tryNext(index: number, testUnit: PQ, unitName:string)
+	{
+		if (this.q.magdim() == 0) { return; }
+		let testpow = this.q.bestPower(testUnit);
+		if (testpow == 0) { return; }
+		var all_leq = true;
+		for (var iDim = 0; iDim < 6; iDim++)
+		{
+			// Not only must the magdim be less, but we don't want any of the
+			// dimensions to increase, even if the overall result is less complex.
+			if (Math.abs(this.q.dim[iDim]) < Math.abs(this.q.dim[iDim]) - Math.abs((testUnit.dim[iDim]*testpow)))
+			{
+				all_leq = false;
+				break;
+			}
+		}
+		if (all_leq)
+		{
+			let qtest = this.q.div(testUnit.pow(testpow));
+			var mdd = this.q.magdim() - qtest.magdim();
+			if (mdd > this.bestMagdimDiff)
+			{
+				this.iBestUnit = index;
+				this.bestUnit = testUnit;
+				this.bestUnitName = unitName;
+				this.bestPow = testpow;
+				this.bestMagdimDiff = mdd;
+			}
+		}
+	} // next()
+};
+
 
 class Settings
 {
