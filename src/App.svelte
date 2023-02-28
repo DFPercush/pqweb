@@ -141,6 +141,11 @@
 		{
 			submitLine();
 		}
+		else if (mainQuery === "" && (['+','*', '-', '/', '^'].indexOf(e.key) !== -1))
+		{
+			//insert("ans");
+			mainQuery = "ans";
+		}
 	}
 
 	function onMainKeyDown(e: KeyboardEvent)
@@ -166,6 +171,10 @@
 			iRecall++;
 			Recall();
 			//e.cancelBubble = true;
+		}
+		else if (e.code == "Escape")
+		{
+			clearEntry();
 		}
 	}
 
