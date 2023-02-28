@@ -10,6 +10,7 @@
 	let wstr: string = ""
 	let qtyStrShort:string = "";
 	let qtyStrLong:string = "";
+	let qtyStrRaw: string = "";
 	let identicalUnits: Unit[] = [];
 	let identicalVars: string[] = [];
 
@@ -34,6 +35,7 @@
 			qtyStrShort = wvar.prettyPrint(varset);
 			settings.useLongNames = true;
 			qtyStrLong = wvar.prettyPrint(varset);
+			qtyStrRaw = `${TrimRightZeros(wvar.n.toPrecision(16))} [${wvar.dim[0]},${wvar.dim[1]},${wvar.dim[2]},${wvar.dim[3]},${wvar.dim[4]},${wvar.dim[5]}]`;
 		}
 		catch {}
 		settings.useLongNames = bkLongPref;
@@ -88,6 +90,7 @@
 			<!-- <span class="qty">{wstr}</span> -->
 		<div class="qty">{qtyStrShort}</div>
 		<div class="qty">{qtyStrLong}</div>
+		<div class="qty-raw">{qtyStrRaw}</div>
 		<div class="dim">
 			<div><div>Mass</div></div><div>{wvar.dim[0]}</div>
 			<div><div>Distance</div></div><div>{wvar.dim[1]}</div>
@@ -156,6 +159,10 @@
 				//background-color: white;
 				color:blue;
 			}
+		}
+		.qty-raw {
+			font-size: 10pt;
+			color: var(--fg);
 		}
 		.dim {
 			display:grid;

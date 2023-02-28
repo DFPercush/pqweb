@@ -21,6 +21,7 @@
 	/*
 	TODO:
 		. higher level catch
+		+ if first char is an operator while typing, insert ans
 		+ print symbolic + long name in memory qty
 		+ whatis show custom vars
 		+ insert variable name from memory
@@ -140,6 +141,11 @@
 		{
 			submitLine();
 		}
+		else if (mainQuery === "" && (['+','*', '-', '/', '^'].indexOf(e.key) !== -1))
+		{
+			//insert("ans");
+			mainQuery = "ans";
+		}
 	}
 
 	function onMainKeyDown(e: KeyboardEvent)
@@ -166,11 +172,16 @@
 			Recall();
 			//e.cancelBubble = true;
 		}
+		else if (e.code == "Escape")
+		{
+			clearEntry();
+		}
 	}
 
 	function submitLine()
 	{
 		// First handle some special commands
+		try {
 		if (mainQuery === "clear") {clear(); return;}
 		let iEq = mainQuery.indexOf('=');
 		let storeTo = "";
@@ -183,8 +194,8 @@
 		var qsplit = mainQuery.split(',');
 		if (qsplit.length > 2)
 		{
-			// TODO: Error box UI
-			return;
+			qsplit[1] = qsplit.splice(1, qsplit.length - 1).join(' ');
+			//return;
 		}
 		let q: PQ;
 		let qstr:string = "";
@@ -199,7 +210,6 @@
 			{
 				if (IsBuiltInUnit(storeTo))
 				{
-					// TODO: Show long name
 					let u = GetUnitFromSymbol(storeTo);
 					let longsing = u.longNameSingular || "";
 					let longpl = u.longNamePlural || "";
@@ -235,6 +245,12 @@
 		scrollNewHistory = true;
 		if (qerr === "") { mainQuery = ""; }
 		//PQ.parse(mainQuery);
+		} // main try
+		catch (e)
+		{
+			History.push({query: "", output:"", error: e.message + "\n" + e.stack, warnings:[]});
+			scrollNewHistory = true;
+		}
 		iRecall = History.length;
 		mainInput.focus();
 	}
@@ -273,12 +289,6 @@
 	function memPlus()
 	{
 		memoryScreen.show();
-		//TODO: 
-		//alert("Not implemented yet.");
-		//showMem = true;
-		//mainInput.focus();
-		//sel = -1;
-		//needFocus = true;
 	}
 
 	function handleImport()

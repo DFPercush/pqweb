@@ -203,7 +203,27 @@ export const Units: Unit[] =
 	du("cmH2O", "centimeter_water","centimeters_water", 98.0665,[1,-1,-2,0,0,0]),
 	du("mmH2O", "millimeter_water","millimeters_water", 9.80665,[1,-1,-2,0,0,0]),
 	du("P", "poise","poise", 0.1,[1,-1,-1,0,0,0], true),
-	du("St", "stokes","stokes", 1.0,[0,2,-1,0,0,0], true)
+	du("St", "stokes","stokes", 1.0,[0,2,-1,0,0,0], true),
+	du("Cd", "candela", "candelas", 1.0, [0,0,0,0,0,1], true),
+	du("candlepower", "candlepower", "candlepower", 0.981, [0,0,0,0,0,1], false),
+	du("lm", "lumen", "lumens", 1.0, [0,0,0,0,0,1], true),
+	// TODO: ^ How to express sr or square radians?
+	// It's technically a scalar, but making no distinction of that fact
+	// from a cd feels kind of incomplete. Maybe we need that angle flag.
+
+	//du("talbot", "talbot", "talbots", 1, [0,0,1,0,0,1], true),
+	du("lx", "lux", "lux", 1.0, [0,-2,0,0,0,1], true),
+	du("fc","foot-candle","feet-candles",10.7639, [0,-2,0,0,0,1],true),
+	du("ph", "phot", "phots", 10000, [0,-2,0,0,0,1], false), // TODO: Exclude prefix "mph" and "kph"
+	du("nx", "nox", "nox", 0.001, [0,-2,0,0,0,1], true),
+	du("sb", "stilb", "stilbs", 10000, [0,-2,0,0,0,1], true),
+	du("asb", "apostilb", "apostilbs", 0.318309886184, [0,-2,0,0,0,1], false),
+	du("blondel", "blondel", "blondels", 1.0 / Math.PI, [0,-2,0,0,0,1], false),
+	du("bril", "bril", "brils", 10e-7 / Math.PI, [0,-2,0,0,0,1], false),
+	du("sk", "skot", "skots", 10e-3 / Math.PI, [0,-2,0,0,0,1], false),
+	du("lambert", "lambert", "lamberts", 10e4 / Math.PI, [0,-2,0,0,0,1], false), // Note: L is already taken
+	du("footlambert", "footlambert", "footlamberts", 3.42625909963, [0,-2,0,0,0,1], false),
+
 ];
 
 const UnitMostComplexOrder: number[] =
@@ -1213,9 +1233,7 @@ export class PQ
 				}
 			}
 			
-
-			//continue; // TODO: Temporary debug, delete this
-
+			
 			if (n.sub[i].sub.length > 0)
 			{
 				this.rdpParens(n.sub[i]);
@@ -1559,7 +1577,8 @@ export class BestUnitSearch
 		{
 			// Not only must the magdim be less, but we don't want any of the
 			// dimensions to increase, even if the overall result is less complex.
-			if (Math.abs(this.q.dim[iDim]) < Math.abs(this.q.dim[iDim]) - Math.abs((testUnit.dim[iDim]*testpow)))
+			//if (Math.abs(this.q.dim[iDim]) < Math.abs(this.q.dim[iDim]) - Math.abs((testUnit.dim[iDim]*testpow)))
+			if (Math.abs(this.q.dim[iDim]) < Math.abs(this.q.dim[iDim] - (testUnit.dim[iDim]*testpow)))
 			{
 				all_leq = false;
 				break;
