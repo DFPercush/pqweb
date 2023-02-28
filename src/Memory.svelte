@@ -52,11 +52,6 @@ function addvar()
 			showErr("Invalid name. Letters, numbers, and _ only");
 		}
 	}
-	else
-	{
-		// TODO: Something better than alert
-		//alert("Must give the new variable a name");
-	}
 }
 
 function typeUnderscore()

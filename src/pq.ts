@@ -1233,9 +1233,7 @@ export class PQ
 				}
 			}
 			
-
-			//continue; // TODO: Temporary debug, delete this
-
+			
 			if (n.sub[i].sub.length > 0)
 			{
 				this.rdpParens(n.sub[i]);
