@@ -20,6 +20,7 @@
 
 	/*
 	TODO:
+		. if first char is an operator while typing, insert ans
 		. higher level catch
 		+ print symbolic + long name in memory qty
 		+ whatis show custom vars
