@@ -181,6 +181,7 @@
 	function submitLine()
 	{
 		// First handle some special commands
+		try {
 		if (mainQuery === "clear") {clear(); return;}
 		let iEq = mainQuery.indexOf('=');
 		let storeTo = "";
@@ -244,6 +245,12 @@
 		scrollNewHistory = true;
 		if (qerr === "") { mainQuery = ""; }
 		//PQ.parse(mainQuery);
+		} // main try
+		catch (e)
+		{
+			History.push({query: "", output:"", error: e.message + "\n" + e.stack, warnings:[]});
+			scrollNewHistory = true;
+		}
 		iRecall = History.length;
 		mainInput.focus();
 	}
