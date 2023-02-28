@@ -35,7 +35,7 @@
 			qtyStrShort = wvar.prettyPrint(varset);
 			settings.useLongNames = true;
 			qtyStrLong = wvar.prettyPrint(varset);
-			qtyStrRaw = `${wvar.n.toPrecision(16)} [${wvar.dim[0]},${wvar.dim[1]},${wvar.dim[2]},${wvar.dim[3]},${wvar.dim[4]},${wvar.dim[5]}]`;
+			qtyStrRaw = `${TrimRightZeros(wvar.n.toPrecision(16))} [${wvar.dim[0]},${wvar.dim[1]},${wvar.dim[2]},${wvar.dim[3]},${wvar.dim[4]},${wvar.dim[5]}]`;
 		}
 		catch {}
 		settings.useLongNames = bkLongPref;
