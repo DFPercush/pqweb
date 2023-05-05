@@ -191,18 +191,12 @@
 			display:grid;
 			justify-content: center;
 			overflow-x:scroll;
-			width: max-content;
 			padding-left: 1em;
 			padding-right: 1em;
 			grid-template-columns: max-content max-content max-content max-content;
+			margin-bottom: 12pt;
 			&>* {
-				// justify-content: left;
-				// justify-items: left;
-				// justify-self: left;
-				// text-align: left;
-				// place-content: left;
-				// place-items: left;
-				margin-left: 5pt
+				margin-left: 15pt
 			}
 		}
 
@@ -214,7 +208,7 @@
 			overflow-x: scroll;
 			padding-bottom: .5em;
 			&>* {
-				margin-left: 5pt;
+				margin-left: 15pt;
 			}
 		}
 
