@@ -841,7 +841,6 @@ export class PQ
 				curClass = CharClass.WHITESPACE;
 				//ts.push(new Token(prevClass, s, tokenBegin, i));
 			}
-			else if (isNumeric(c)) { curClass = CharClass.NUMBER; }
 			//else if (prevClass == CharClass.NUMBER && c == '.') { curClass = CharClass.NUMBER; }
 			else if (c == '.') { curClass = CharClass.NUMBER; }
 			else if (prevClass == CharClass.NUMBER && (c == 'e' || c == 'E'))
@@ -855,6 +854,7 @@ export class PQ
 				curClass = CharClass.NUMBER;
 			}
 			else if (prevClass == CharClass.SYMBOL && isAlphaNumeric(c)) { curClass = CharClass.SYMBOL; }
+			else if (isNumeric(c)) { curClass = CharClass.NUMBER; }
 			else if (isAlpha(c)) { curClass = CharClass.SYMBOL; }
 			else if (c == '(') { curClass = CharClass.OPEN; }
 			else if (c == ')') { curClass = CharClass.CLOSE; }
