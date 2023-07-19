@@ -324,7 +324,8 @@ export class PQ
 	public dim: Dim = [0,0,0,0,0,0];
 	public extra: {[name: string]: number} = {};
 
-	
+	static readonly SoloChars : string = "()+-/*^";
+
 
 	constructor(x: number, d: Dim, iofs: number = 0)
 	{
@@ -817,7 +818,6 @@ export class PQ
 	}
 
 
-
 	static parse(s:string, varset: PQVars): PQ
 	{
 		let ts: Token[] = [];
@@ -872,6 +872,12 @@ export class PQ
 				//console.log("pc = " + pc + "  ,  c = " + c);
 				ts.push(new Token(prevClass, s, tokenBegin, i));
 				tokenBegin = i;
+			}
+			else if (PQ.SoloChars.indexOf(c) != -1)
+			{
+				ts.push(new Token(curClass, s, i, i + 1))
+				tokenBegin = i + 1;
+				curClass = CharClass.WHITESPACE;
 			}
 			//if (curClass == CharClass.WHITESPACE) { tokenBegin = i; }
 
@@ -1209,17 +1215,20 @@ export class PQ
 		{
 			if (n.sub[i].ty == CharClass.OPEN)
 			{
-				console.log("open");
-				pparen = i;
-				pbegin = i + 1;
+				if (level == 0)
+				{
+					//console.log("open");
+					pparen = i;
+					pbegin = i + 1;
+				}
 				level++;
 			}
 			else if (n.sub[i].ty == CharClass.CLOSE)
 			{
-				console.log("close");
 				level--;
 				if (level == 0)
 				{
+					//console.log("close");
 					pend = i;
 					n.sub[pparen].ty = CharClass.PAREN;
 					//n.sub[pparen].sub = n.sub.splice(pbegin, pend - pbegin);
@@ -1517,11 +1526,12 @@ export function GetUnitFromSymbol(symbol:string): Unit
 export function TrimRightZeros(s:string)
 {
 	s = s.trim();
-	let ipt = s.indexOf('.');
-	if (ipt === -1)
+
+	if (s.indexOf(".") == -1 || s.indexOf("e") != -1 || s.indexOf("E") != -1)
 	{
 		return s;
 	}
+
 	let iz = s.length;
 	do
 	{
