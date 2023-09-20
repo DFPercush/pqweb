@@ -324,7 +324,7 @@ export class PQ
 	public dim: Dim = [0,0,0,0,0,0];
 	public extra: {[name: string]: number} = {};
 
-	static readonly SoloChars : string = "()+-/*^";
+	static readonly SoloChars : string = "()/*^";
 
 
 	constructor(x: number, d: Dim, iofs: number = 0)
@@ -865,6 +865,9 @@ export class PQ
 			else if (c == '^') { curClass = CharClass.EXP; }
 			else { curClass = CharClass.UNKNOWN; }
 			//while (i < s.length && isWhitespace(s[i])) { i++ }
+
+			// DBG:
+			//console.log(`'${pc}':${prevClass} -> '${c}':${curClass}`);
 
 			//console.log(i, tokenBegin, prevClass, pc, curClass, c);
 			if (curClass != prevClass && prevClass != CharClass.WHITESPACE)
