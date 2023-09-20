@@ -817,8 +817,7 @@ export class PQ
 		return ret;
 	}
 
-
-	static parse(s:string, varset: PQVars): PQ
+	static tokenize(s: string): Token[]
 	{
 		let ts: Token[] = [];
 		let c = ' ';
@@ -924,35 +923,12 @@ export class PQ
 				i--;
 			}
 		}
+		return ts;
+	}
 
-		//// Next handle implicit multiplication
-		//for (var i = 1; i < ts.length; i++)
-		//{
-		//	if ((ts[i].ty == CharClass.NUMBER || ts[i].ty == CharClass.SYMBOL) &&
-		//		//(ts[i-1].ty == CharClass.NUMBER || ts[i-1].ty == CharClass.SYMBOL))
-		//		ts[i-1].ty != CharClass.ADD &&
-		//		ts[i-1].ty != CharClass.SUB &&
-		//		ts[i-1].ty != CharClass.MUL &&
-		//		ts[i-1].ty != CharClass.DIV &&
-		//		ts[i-1].ty != CharClass.EXP)
-		//	{
-		//		//ts.splice(i, 0, new Token(CharClass.MUL, s, ts[i].begin, ts[i].begin, "*"));
-		//		let ti = ts[i];
-		//		let tim1 = ts[i-1];
-		//		ts.splice(i-1, 2, 
-		//			new Token(CharClass.OPEN, s, tim1.begin, ti.end, "("),
-		//			tim1,
-		//			new Token(CharClass.MUL, s, ti.begin, ti.begin, "*"),
-		//			ti,
-		//			new Token(CharClass.CLOSE, s, ti.end, ti.end, ")")
-		//			);
-		//	}
-		//}
-
-		// DBG: PRINT TOKEN STREAM
-		//console.log(sca(ts));
-
-
+	static parseAST(s:string): ASTNode
+	{
+		var ts = PQ.tokenize(s);
 		let root: ASTNode =
 		{
 			ty: CharClass.ROOT,
@@ -995,10 +971,18 @@ export class PQ
 		//this.printAST(root);
 		//console.log(" ===== END FINAL =====");
 
+		return root;
+	}
+
+
+	static parse(s:string, varset: PQVars): PQ
+	{
+		let root = PQ.parseAST(s, varset);
 		let result = PQ.evalAST(root, varset);
 		//console.log(result);
 		return result;
 	}
+
 
 	static breaksImplicitMul(n:ASTNode): boolean
 	{
@@ -1336,7 +1320,7 @@ const InverseOrderOfOperations: string[][] =
 	['(', ')']
 ];
 
-type ASTNode = 
+export type ASTNode = 
 {
 	ty: CharClass;
 	text: string;
@@ -1393,7 +1377,7 @@ export function isAlphaNumeric(s:string):boolean
 	}
 	return true;
 }
-enum CharClass
+export enum CharClass
 {
 	UNKNOWN = 0,
 	WHITESPACE = 1,
@@ -1649,4 +1633,8 @@ class Settings
 };
 
 export let settings:Settings = new Settings();
+
+
+
+
 
